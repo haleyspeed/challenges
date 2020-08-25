@@ -1,0 +1,475 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+# Probability Theory 
+
+Generate 10 separate random flips with probability 0.3
+```{r}
+rbinom(10, 1, 0.3)
+
+```
+
+Generate 100 occurrences of flipping 10 coins, each with 30% probability
+```{r}
+rbinom(100,10,0.3)
+```
+
+If you have 10 coin flips and there's a 0.5 probability of getting a success 
+and a success earns you $1 and a fail costs you \$1, do you take the bet?
+
+X ~ Binom(10, 0.5)
+Pr(X = 5)
+
+```{r}
+flips <- rbinom(1000000, 10, 0.5)
+hist(flips)
+pr_5 <- mean(flips == 5)
+```
+
+With dbinom you can combine this into one step. What is the probability of
+5 heads? 6 heads? 10 heads?
+
+```{r}
+pr_5 <- dbinom(5,10, 0.5) # condition is 5, 10 draws, 0.5 prob of success
+pr_5
+pr_6 <-dbinom(6,10,0.5)
+pr_6
+pr_10 <- dbinom (10, 10, 0.5)
+pr_10
+```
+
+
+Calculate the number of flips <= 4 with 10 flips and a 0.5 probability of success?
+X ~ Binom (10, 0.5)
+Pr (X <= 4)
+```{r}
+flips <- rbinom(1000000, 10, 0.5)
+cumulative <- mean (flips <= 4)
+cumulative
+
+cumulative <- pbinom (4, 10, 0.5)
+cumulative
+```
+
+
+If you flip 10 coins each with a 30% probability of coming up heads, what is 
+the probability exactly 2 of them are heads?
+```{r}
+# X ~ Binomial (10, 0.3)
+# Pr (X = 2)
+
+# With dbinom
+P <- dbinom (2, 10, 0.3)
+P
+
+# Confirmation
+flips <- rbinom (100000, 10, 0.3)
+P <- mean (flips  == 2)
+P
+
+```
+
+
+Calculate the probability that at least five coins are heads
+Confirm your answer with a simulation of 10,000 trials
+```{r}
+p <- 1-pbinom (4, 10, 0.3)
+p
+
+flips <- rbinom (10000, 10, 0.3)
+p <- mean(flips >= 5)
+p
+```
+
+
+What is the expected value of a binomial distribution where 25 coins are 
+flipped, each having a 30% chance of heads?
+```{r}
+# Calcualte the expected value using the exact formula
+# X ~ Binom (25, 0.3)
+# E[X] = 25 * (0.3)
+# Var (X) = 25 * 0.3 * 0.7
+
+e <- 25*0.3
+e
+
+#Confirm with a simulation using R binom
+e <- mean(rbinom(10000, 25, .3))
+e
+
+# Calculate the variance using the exact formula
+v <- 25 * 0.3 * 0.7
+v
+
+# Confirm with a simulation using rbinom
+flips <- rbinom(10000, 25, 0.3)
+v <- var(flips)
+v
+```
+
+# Simulate two coins being flipped 
+
+What is the probability of both A and B being successful?
+
+```{r}
+A <- rbinom(10000, 1, 0.5)
+B <- rbinom(10000, 1, 0.5)
+
+mean(A & B)
+```
+
+
+If event A has 10% probability and B has a probability of 70% success, what is 
+the probability of them occurring together?
+
+```{r}
+A <- rbinom (10000, 1, 0.1)
+B <- rbinom (10000, 1, 0.7)
+
+mean(A & B)
+```
+
+
+Coin A has a 40% probability of being heads and Coin B has a 20% probability of
+being heads, what is the probability of both coming up heads?
+
+```{r}
+# Simulate 100,000 flips of a coin with a 40% chance of heads
+A <- rbinom(10000, 1, 0.2) 
+
+# Simulate 100,000 flips of a coin with a 20% chance of heads
+B <- rbinom (10000, 1, 0.4)
+
+# Estimate the probability both A and B are heads
+mean(A & B)
+```
+
+
+What if a 3rd coin, C, is tossed with a 70% chance of heads? What is the 
+probability of all 3 occurring? 
+
+```{r}
+# Theoretically
+P <- 0.2*0.4*0.7
+P
+
+C <- rbinom(100000, 1, 0.7)
+mean (A & B & C)
+```
+
+What is the probability of either of two coins being flipped to come up heads 
+if both have a 50% probability of coming up heads?
+```{r}
+
+# Theoretically,
+# P(A | B) = 0.5 + 0.5 - 0.5 * 0.5 = 7.5%
+
+A <- rbinom(100000, 1, 0.5)
+B <- rbinom(100000, 1, 0.5)
+mean (A | B)
+```
+
+
+What if A has a 20% prob and B has a 40% prob?
+```{r}
+# Theoretically
+# P(A | B) = 0.2 + 0.4 - 0.2 * 0.4 = 0.6 - 0.08 = 0.52
+
+A <- rbinom (100000, 1, 0.2)
+B <- rbinom (100000, 1, 0.4)
+mean(A | B)
+```
+
+If coins A and B are independent, and A has a 60% chance of coming up heads, 
+and event B has a 10% chance of coming up heads, what is the probability 
+either A or B will come up heads?
+```{r}
+A <- rbinom(100000, 1, 0.6)
+B <- rbinom(100000, 1, 0.1)
+mean(A|B)
+```
+
+
+Suppose X is a random Binom(10, .6) variable (10 flips of a coin with 60% 
+chance of heads) and Y is a random Binom(10, .7) variable (10 flips of a coin 
+with a 70% chance of heads), and they are independent.
+
+What is the probability that either of the variables is less than or equal to 4?
+```{r}
+X <- rbinom (100000, 10, 0.6)
+Y <- rbinom (100000, 10, 0.7)
+
+X_mean = mean(X <= 4)
+X_mean
+Y_mean = mean(Y <= 4)
+Y_mean
+
+P <- X_mean + Y_mean - X_mean * Y_mean
+P
+
+P <- mean (X <= 4 | Y <= 4)
+P
+```
+
+If X is a binomial with size 50 and p = .4, what is the expected value of 3*X?
+```{r}
+# Theoretically
+# E[k*X] = constant * sample_size * probability of success
+p <- 3 * 50 * 0.4
+p
+
+# Programmatically
+X <- rbinom (100000, 50, 0.4)
+mean(X* 3) 
+
+```
+
+Simulate 100,000 draws of X, a binomial random variable with size 20 and p = .1. Save this as X
+Use this simulation to estimate the expected value of X.
+Use this simulation to estimate the expected value of 5*X, as well.
+Use this simulation to estimate the variance of X.
+Estimate the variance of 5 * X
+```{r}
+X <- rbinom(100000, 20, 0.1)
+pX<- mean(X)
+p5X <- mean(X) * 5
+pX
+p5X
+
+vX <- 20 * 0.1 * 0.9
+v5X <- 20 * 0.1 * 0.9 * 5**2
+vX
+v5X
+
+var(X)
+var(X * 5)
+
+```
+
+Calculate Z ~ X + Y where X is 10 coin flips with a 50% probability of success
+and Y is 100 coin flips with a 20% probability of success. What is the point 
+estimate of X, Y, and Z? What is the variance?
+```{r}
+X <- rbinom (100000, 10, 0.5)
+Y <- rbinom (100000, 100, 0.2)
+
+EX <- mean(X)
+EX
+
+EY <- mean(Y)
+EY
+
+Z <- X + Y
+EZ <- mean(X + Y)
+EZ
+
+VX <- 10 * 0.5 * 0.5
+VX
+
+VY <- 100 * 0.2 * 0.8
+VY
+
+VZ <- VY + VX
+VZ
+
+var(X + Y)
+var
+
+hist (X + Y)
+
+
+```
+
+If X is drawn from a binomial with size 20 and p = .3, and Y from size 40 
+and p = .1, what is the expected value (mean) of X + Y?
+
+```{r}
+# Theortically 
+# E[X] = 20 * 0.3 = 6
+# E[Y] = 40 * 0.1 = 4
+# Z[Y] = 6 + 4 = 10
+
+X <- rbinom(100000, 20, 0.3)
+Y <- rbinom(100000, 40, 0.1)
+Z <- mean(X) + mean (Y)
+Z
+
+```
+
+Simulate 100,000 draws of X (size 20, p = .3) and Y (size 40, p = .1). Estimate 
+the expected value of X + Y. Estimate the variance of X + Y, estimate the
+variance of 3*X + Y
+```{r}
+# Theoretically
+# E[X] = 20 * 0.3 = 6
+# E[Y] = 40 * 0.1 = 4
+# V[X] = 20 * 0.3 * 0.7 = 4.2
+# V[Y] = 40 * 0.1 * 0.9 = 3.6
+# E[Z] = E[X] + E[Y] = 6 + 4 = 10
+# V[Z] = V[X] + V[Y] = 4.2 + 3.6 = 7.8
+# V[3X] = 3**2 * V[X] = 37.8
+# V[3Z] = V[3X] + V[Y] = 37.8 + 3.6 = 41.4
+
+X <- rbinom (100000, 20,0.3)
+Y <- rbinom (100000, 40, 0.1)
+Z <- mean(X) + mean(Y)
+Z
+
+V <- var(X) + var(Y)
+V
+
+V3 <- var(3*X) + var(Y)
+V3
+```
+
+Given a coin, how do you know if it is loaded? What is the probability if you 
+get 16 heads and 4 tails?
+
+```{r}
+# Flip the coin 20 times and if the mean probability is not 50% + 1 SD == loaded
+
+# 16 heads
+P <- 16/20
+P
+```
+
+
+If you have 2 piles of 50,000 coins and you assume  50,000 are fair and 50,000
+are biased. if you flipped each coin 20 times, what would the histogram look 
+like?
+
+Pr(Biased | 14 Heads) = #biased/w14 heads / #total w/14 heads
+
+```{r}
+X <- rbinom(50000,20, 0.5)
+hist (X)
+
+Y <- rbinom(50000,20, 0.75)
+hist(Y)
+
+hist(X + Y)
+
+# Run the simulation the 50,0000 times and see how many tosses resulted in 
+# 14 successes
+
+X_14 <- length(X[X == 14])
+X_14
+probX_14 <- num_14/50000
+probX_14
+
+Y_14 <- length(Y[Y == 14])
+Y_14
+probY_14 <- Y_14/50000
+probY_14
+
+Z_14 <- X_14 + Y_14
+Z_14
+pZ_14 <- Z_14/50000
+pZ_14
+
+p <- Y_14/(X_14 + Y_14)
+p
+```
+We see 11 out of 20 flips from a coin that is either fair (50% chance of heads) 
+or biased (75% chance of heads). How likely is it that the coin is fair? 
+Answer this by simulating 50,000 fair coins and 50,000 biased coins.
+
+```{r}
+f <- rbinom(50000, 20, 0.5)
+b <- rbinom(50000, 20, 0.75)
+f11 <- length(f[f == 11])
+b11 <- length(b[b == 11])
+p <- f11/(f11 + b11)
+p
+```
+
+We see 16 out of 20 flips from a coin that is either fair (50% chance of heads) 
+or biased (75% chance of heads). How likely is it that the coin is fair?
+
+```{r}
+f <- rbinom(50000, 20, 0.5)
+b <- rbinom(50000, 20, 0.75)
+
+f16 <- length(f[f == 16])
+b16 <- length(b[b == 16])
+p <- f16/(f16 + b16)
+p
+```
+
+
+Given a coin, you suspect that there’s a 90% chance that it’s fair. In this 
+case there are 90,000 fair coins and 10,000 biased coins. You get 14 heads out 
+of 20 trials. Is your coin fair?
+
+```{r}
+f <- rbinom (90000, 20, 0.5)
+b <- rbinom(10000, 20, 0.75)
+f14 <- length(f[f == 14])
+b14 <- length(b[b == 14])
+f14
+b14
+
+fraction_biased = b14/(f14 + b14)
+fraction_biased
+
+
+```
+
+
+We see 14 out of 20 flips are heads, and start with a 80% chance the coin is 
+fair and a 20% chance it is biased to 75%. You'll solve this case with 
+simulation, by starting with a "bucket" of 10,000 coins, where 8,000 are fair 
+and 2,000 are biased, and flipping each of them 20 times.
+
+```{r}
+# Simulate 8000 cases of flipping a fair coin, and 2000 of a biased coin
+fair_flips <-rbinom(8000,20,0.5)
+biased_flips <-rbinom(2000, 20, 0.75)
+
+# Find the number of cases from each coin that resulted in 14/20
+fair_14 <- sum(fair_flips == 14)
+biased_14 <-sum(biased_flips == 14)
+
+# Use these to estimate the posterior probability
+fair_14/(fair_14 + biased_14)
+```
+
+
+Suppose instead of a coin being either fair or biased, there are three 
+possibilities: that the coin is fair (50% heads), low (25% heads), and 
+high (75% heads). There is a 80% chance it is fair, a 10% chance it is 
+biased low, and a 10% chance it is biased high.You see 14/20 flips are heads. 
+What is the probability that the coin is fair?
+```{r}
+# Simulate 80,000 draws from fair coin, 10,000 from each of high and low coins
+flips_fair <- rbinom(80000, 20, 0.5)
+flips_high <- rbinom(10000, 20, .75)
+flips_low <- rbinom(10000, 20, .25)
+
+# Compute the number of coins that resulted in 14 heads from each of these piles
+fair_14 <- sum (flips_fair == 14)
+high_14 <- sum(flips_high == 14)
+low_14 <- sum(flips_low == 14)
+
+# Compute the posterior probability that the coin was fair
+fair_14/(fair_14 + high_14 + low_14)
+```
+
+
+
+
+
+
+
+
+
+
+
+Add a new chunk by clicking the *Insert Chunk* button on the toolbar or by pressing *Cmd+Option+I*.
+
+When you save the notebook, an HTML file containing the code and output will be saved alongside it (click the *Preview* button or press *Cmd+Shift+K* to preview the HTML file). 
+
+The preview shows you a rendered HTML copy of the contents of the editor. Consequently, unlike *Knit*, *Preview* does not run any R code chunks. Instead, the output of the chunk when it was last run in the editor is displayed.
+
